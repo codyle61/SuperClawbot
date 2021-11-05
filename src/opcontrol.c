@@ -51,17 +51,21 @@ void operatorControl() {
 	int target;
 	int lock = encoderGet(shoulderEnc);
 
-	int x1 = 11;
-	int y1 = 14;
+	int x1 = 20;
+	int y1 = 0;
 	int l1 = 11;
 	int l2 = 14;
 	double a2;
 	double a1;
 	a2 = position1(x1,y1,l1,l2);
 	a1 = position2(a2,x1,y1,l1,l2);
-	a2 += a1;
+	a2 = a1 - a2;
 	a1 *= (180/M_PI);
 	a2 *= (180/M_PI);
+
+//a1 = 74.3666;
+//a2 = -31.982;
+
 
 	delay(20);
 	while (1) {
@@ -90,7 +94,7 @@ void operatorControl() {
 		    motorSet(5,-3*(lock - encoderGet(shoulderEnc)));
 			}
 
-			if(joystickGetDigital(1,7,JOY_LEFT)) {
+			if(joystickGetDigital(1,7,JOY_LEFT)) {//shoulder homing
 				while(digitalRead(5) == HIGH) {
 			      motorSet(5,50);
 			  }
@@ -104,7 +108,7 @@ void operatorControl() {
 				lock = encoderGet(shoulderEnc);
 			}
 
-			if(joystickGetDigital(1,7,JOY_UP)) {
+			if(joystickGetDigital(1,7,JOY_UP)) { //elbow homing
 				while(digitalRead(3) == HIGH) {
 			      motorSet(6,-50);
 			  }
@@ -117,9 +121,10 @@ void operatorControl() {
 				encoderReset(elbowEnc);
 			}
 
+
 			while (joystickGetDigital(1,7,JOY_RIGHT)) {
-				error = 0.6*(encoderGet(shoulderEnc) - a1);
-				error2 = 0.5*(encoderGet(elbowEnc) - a2);
+				error = (0.6*encoderGet(shoulderEnc) - a1);
+				error2 = (0.5*encoderGet(elbowEnc) - a2);
 				if((error < 42) && (error > -42)) {
 					motorSet(5,error*3);
 				} else if(error >= 42) {

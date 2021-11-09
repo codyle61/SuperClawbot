@@ -51,18 +51,6 @@ void operatorControl() {
 	int target;
 	int lock = encoderGet(shoulderEnc);
 
-	int x1 = 20;
-	int y1 = 0;
-	int l1 = 11;
-	int l2 = 14;
-	double a2;
-	double a1;
-	a2 = position1(x1,y1,l1,l2);
-	a1 = position2(a2,x1,y1,l1,l2);
-	a2 = a1 - a2;
-	a1 *= (180/M_PI);
-	a2 *= (180/M_PI);
-
 //a1 = 74.3666;
 //a2 = -31.982;
 
@@ -122,7 +110,20 @@ void operatorControl() {
 			}
 
 
-			while (joystickGetDigital(1,7,JOY_RIGHT)) {
+			if (joystickGetDigital(1,7,JOY_RIGHT)) {
+				int x1 = 20;
+				int y1 = 0;
+				int l1 = 11;
+				int l2 = 14;
+				double a2;
+				double a1;
+				for(int x = 0; x < 5; x++) {	
+					a2 = position1(x1,y1,l1,l2);
+					a1 = position2(a2,x1,y1,l1,l2);
+					a2 += a1;
+					a1 *= (180/M_PI);
+					a2 *= (180/M_PI);
+				}
 				error = (0.6*encoderGet(shoulderEnc) - a1);
 				error2 = (0.5*encoderGet(elbowEnc) - a2);
 				if((error < 42) && (error > -42)) {

@@ -1,4 +1,4 @@
-/** @file opcontrol.c
+ /** @file opcontrol.c
  * @brief File for operator control code
  *
  * This file should contain the user operatorControl() function and any functions related to it.
@@ -111,44 +111,63 @@ void operatorControl() {
 
 
 			if (joystickGetDigital(1,7,JOY_RIGHT)) {
-				int x1 = 20;
-				int y1 = 0;
-				int l1 = 11;
-				int l2 = 14;
+				double l1 = 10.5;
+				double l2 = 13.6;
+				double x1 = l1+l2-1;
+				double y1 = -2; //-1-1
 				double a2;
 				double a1;
-				for(int x = 0; x < 5; x++) {	
-					a2 = position1(x1,y1,l1,l2);
-					a1 = position2(a2,x1,y1,l1,l2);
-					a2 += a1;
+				bool chk1;
+				bool chk2;
+				for(int x = x1-1; x >= (x1-10); x--) { // 10 in
+					chk1 = true;
+					chk2 = true;
+					a2 = position1(x,y1,l1,l2);
+					a1 = position2(a2,x,y1,l1,l2);
+					a2 -= a1;
 					a1 *= (180/M_PI);
-					a2 *= (180/M_PI);
-				}
-				error = (0.6*encoderGet(shoulderEnc) - a1);
-				error2 = (0.5*encoderGet(elbowEnc) - a2);
-				if((error < 42) && (error > -42)) {
-					motorSet(5,error*3);
-				} else if(error >= 42) {
-					motorSet(5,127);
-				} else if(error <= -42) {
-					motorSet(5,-127);
-				} else {
-					motorSet(5,0);
-				}
+					a2 *= -(180/M_PI);
+					//printf("\na1: %f", a1);
+					//printf("\na2: %f", a2);
+					while(chk1 || chk2) {
+						error = (int) round((0.6*encoderGet(shoulderEnc) - a1));
+						error2 = (int) round((0.5*encoderGet(elbowEnc) - a2));
+						lock = encoderGet(shoulderEnc);
+						//printf("\n ch1: %d",chk1);
+						//printf("   -    chk2: %d",chk2);
+						if((error < 42) && (error > -42) && chk1) {
+							motorSet(5,error*12);
+						    if((-3 < error) && (error < 3)) {
+									//printf("\na: %d", error);
+				 					chk1 = false;
+								}
+								//printf("a: %d", error);
+								//printf(" bool: %d",chk1);
+						} else if(error >= 42 && chk1) {
+							motorSet(5,127);
+						} else if(error <= -42 && chk1) {
+							motorSet(5,-127);
+						} else {
+							motorSet(5,0);
+						}
 
-				if((error2 < 42) && (error2 > -42)) {
-					motorSet(6,error2*3);
-				} else if(error2 >= 42) {
-					motorSet(6,127);
-				} else if(error2 <= -42) {
-					motorSet(6,-127);
-				} else {
-					motorSet(6,0);
+						if((error2 < 42) && (error2 > -42) && chk2) {
+							motorSet(6,error2*12);
+							if((-3 < error2) && (error2 < 3)) {
+								chk2 = false;
+							}
+						} else if(error2 >= 42 && chk2) {
+							motorSet(6,127);
+						} else if(error2 <= -42 && chk2) {
+							motorSet(6,-127);
+						} else {
+							motorSet(6,0);
+						}
+					}
 				}
-
 			}
 // precondition()^ needs to be homed first
 
-			delay(20);
+			delay(50);
 	}
 }

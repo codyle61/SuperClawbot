@@ -45,11 +45,16 @@ void operatorControl() {
 	pinMode(3, INPUT); //shoulder
 	pinMode(4, INPUT); //elbow
 	//limit switch initialize
+	analogCalibrate(1);
+	analogCalibrate(2);
+	analogCalibrate(3);
+	//
 	int error;
 	int error2;
 
 	int target;
 	int lock = encoderGet(shoulderEnc);
+	int lock2 = encoderGet(elbowEnc);
 
 //a1 = 74.3666;
 //a2 = -31.982;
@@ -68,7 +73,7 @@ void operatorControl() {
 		  } else if (joystickGetDigital(1,5,JOY_DOWN)) {
 		    motorSet(6,-127);
 		  } else {
-		    motorSet(6,0);
+		     motorSet(6,-2*(lock2 - encoderGet(elbowEnc)));
 		  }
 
 
@@ -107,6 +112,7 @@ void operatorControl() {
 				}
 				motorSet(6,0);
 				encoderReset(elbowEnc);
+				lock2 = encoderGet(elbowEnc);
 			}
 
 
@@ -133,6 +139,7 @@ void operatorControl() {
 						error = (int) round((0.6*encoderGet(shoulderEnc) - a1));
 						error2 = (int) round((0.5*encoderGet(elbowEnc) - a2));
 						lock = encoderGet(shoulderEnc);
+						lock2 = encoderGet(elbowEnc);
 						//printf("\n ch1: %d",chk1);
 						//printf("   -    chk2: %d",chk2);
 						if((error < 42) && (error > -42) && chk1) {
@@ -165,6 +172,10 @@ void operatorControl() {
 						}
 					}
 				}
+			}
+
+			while(joystickGetDigital(1,8,JOY_DOWN)) {
+				
 			}
 // precondition()^ needs to be homed first
 

@@ -56,6 +56,10 @@ void operatorControl() {
 	int lock = encoderGet(shoulderEnc);
 	int lock2 = encoderGet(elbowEnc);
 
+	int lineFL;
+	int lineFM;
+	int lineFR;
+
 //a1 = 74.3666;
 //a2 = -31.982;
 
@@ -175,7 +179,19 @@ void operatorControl() {
 			}
 
 			while(joystickGetDigital(1,8,JOY_DOWN)) {
-				
+					lineFL = analogReadCalibrated(1);
+					lineFM = analogReadCalibrated(2);
+					lineFR = analogReadCalibrated(3);
+
+					if(lineFM > lineFL && lineFM > lineFR) {
+						chassisSet(60,60);
+					} else if(lineFR > lineFL && lineFR > lineFM) {
+						chassisSet(-60,60);
+					} else if(lineFL > lineFR && lineFL && lineFM) {
+						chassisSet(60,-60);
+					} else {
+						chassisSet(-60,-60);
+					}
 			}
 // precondition()^ needs to be homed first
 

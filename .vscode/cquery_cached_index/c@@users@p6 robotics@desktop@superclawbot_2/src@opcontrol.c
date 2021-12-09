@@ -49,8 +49,8 @@ void operatorControl() {
 	analogCalibrate(2);
 	analogCalibrate(3);
 	//
-	int error;
-	int error2;
+	int errorS;
+	int errorE;
 
 	int target;
 	int lock = encoderGet(shoulderEnc);
@@ -74,8 +74,10 @@ void operatorControl() {
 
 			if (joystickGetDigital(1,5,JOY_UP)) {//elbow
 		    motorSet(6,127);
+				lock2 = encoderGet(elbowEnc);
 		  } else if (joystickGetDigital(1,5,JOY_DOWN)) {
 		    motorSet(6,-127);
+				lock2 = encoderGet(elbowEnc);
 		  } else {
 		     motorSet(6,-2*(lock2 - encoderGet(elbowEnc)));
 		  }
@@ -140,36 +142,36 @@ void operatorControl() {
 					//printf("\na1: %f", a1);
 					//printf("\na2: %f", a2);
 					while(chk1 || chk2) {
-						error = (int) round((0.6*encoderGet(shoulderEnc) - a1));
-						error2 = (int) round((0.5*encoderGet(elbowEnc) - a2));
+						errorS = (int) round((0.6*encoderGet(shoulderEnc) - a1));
+						errorE = (int) round((0.5*encoderGet(elbowEnc) - a2));
 						lock = encoderGet(shoulderEnc);
 						lock2 = encoderGet(elbowEnc);
 						//printf("\n ch1: %d",chk1);
 						//printf("   -    chk2: %d",chk2);
-						if((error < 42) && (error > -42) && chk1) {
-							motorSet(5,error*12);
-						    if((-3 < error) && (error < 3)) {
+						if((errorS < 42) && (errorS > -42) && chk1) {
+							motorSet(5,errorS*12);
+						    if((-3 < errorS) && (errorS < 3)) {
 									//printf("\na: %d", error);
 				 					chk1 = false;
 								}
 								//printf("a: %d", error);
 								//printf(" bool: %d",chk1);
-						} else if(error >= 42 && chk1) {
+						} else if(errorS >= 42 && chk1) {
 							motorSet(5,127);
-						} else if(error <= -42 && chk1) {
+						} else if(errorS <= -42 && chk1) {
 							motorSet(5,-127);
 						} else {
 							motorSet(5,0);
 						}
 
-						if((error2 < 42) && (error2 > -42) && chk2) {
-							motorSet(6,error2*12);
-							if((-3 < error2) && (error2 < 3)) {
+						if((errorE < 42) && (errorE > -42) && chk2) {
+							motorSet(6,errorE*12);
+							if((-3 < errorE) && (errorE < 3)) {
 								chk2 = false;
 							}
-						} else if(error2 >= 42 && chk2) {
+						} else if(errorE >= 42 && chk2) {
 							motorSet(6,127);
-						} else if(error2 <= -42 && chk2) {
+						} else if(errorE <= -42 && chk2) {
 							motorSet(6,-127);
 						} else {
 							motorSet(6,0);
@@ -179,21 +181,21 @@ void operatorControl() {
 			}
 
 			while(joystickGetDigital(1,8,JOY_DOWN)) {
-					lineFL = analogReadCalibrated(1);
-					lineFM = analogReadCalibrated(2);
-					lineFR = analogReadCalibrated(3);
-
-					if(lineFM > lineFL && lineFM > lineFR) {
-						chassisSet(60,60);
-					} else if(lineFR > lineFL && lineFR > lineFM) {
-						chassisSet(-60,60);
-					} else if(lineFL > lineFR && lineFL && lineFM) {
-						chassisSet(60,-60);
-					} else {
-						chassisSet(-60,-60);
-					}
+				lineFL = analogReadCalibrated(1);
+				lineFM = analogReadCalibrated(2);
+				lineFR = analogReadCalibrated(3);
+				if(lineFM < 500 && lineFR < 500 && lineFL < 500){
+	      chassisSet(-25,-25);
+	      } else {
+		      if(lineFM > lineFL && lineFM > lineFR){
+		      	chassisSet(50,50);
+		      } else if(lineFL < lineFR) {
+		          chassisSet(50,25);
+		      } else if(lineFR < lineFL) {
+		          chassisSet(25,50);
+		      }
+	      }
 			}
-// precondition()^ needs to be homed first
 
 			delay(50);
 	}

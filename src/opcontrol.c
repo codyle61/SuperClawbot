@@ -185,14 +185,14 @@ void operatorControl() {
 				lineFM = analogReadCalibrated(2);
 				lineFR = analogReadCalibrated(3);
 				if(lineFM < 500 && lineFR < 500 && lineFL < 500){
-	      chassisSet(-25,-25);
+	      chassisSet(-50,-50);
 	      } else {
 		      if(lineFM > lineFL && lineFM > lineFR){
 		      	chassisSet(50,50);
 		      } else if(lineFL < lineFR) {
-		          chassisSet(50,25);
+		          chassisSet(30,-35);
 		      } else if(lineFR < lineFL) {
-		          chassisSet(25,50);
+		          chassisSet(-35,30);
 		      }
 	      }
 			}

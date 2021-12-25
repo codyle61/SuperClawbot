@@ -35,6 +35,7 @@
 void operatorControl() {
 	int power, turn;
   Encoder shoulderEnc;
+	Ultrasonic frontSonar;
 	Encoder elbowEnc;
 	shoulderEnc = encoderInit(8, 9, false);
 	elbowEnc = encoderInit(6, 7, false);
@@ -59,6 +60,11 @@ void operatorControl() {
 	int lineFL;
 	int lineFM;
 	int lineFR;
+ 	double kpU = 0.1;
+        int powerU;
+        int errorU;
+        int maxOut = 127;
+        frontSonar = ultrasonicInit(1, 2);
 
 //a1 = 74.3666;
 //a2 = -31.982;
@@ -179,7 +185,7 @@ void operatorControl() {
 					}
 				}
 			}
-
+			
 			while(joystickGetDigital(1,8,JOY_DOWN)) {
 				lineFL = analogReadCalibrated(1);
 				lineFM = analogReadCalibrated(2);
@@ -196,6 +202,26 @@ void operatorControl() {
 		      }
 	      }
 			}
+			
+		     while (joystickGetDigital(1, 7, JOY_DOWN)) {
+				distanceToTarget = ultrasonicGet(frontSonar);
+
+				//printf("The distance to target is %d \n", distanceToTarget);
+			if(distanceToTarget > 0 && distanceToTarget < 70) {
+ 				 errorU = (20 - distanceToTarget);
+ 				 powerU = kpU * errorU;
+ 				 if(abs(errorU) < maxOut){
+  					chassisSet (-1*powerU, -1*powerU);
+				 } else {
+    					 chassisSet(-1*powerU/abs(powerU)*maxOut,-1*powerU/abs(powerU)*maxOut);
+   				 }
+
+		   	} else {
+				chassisSet(-50, 50);
+			}
+			     delay(50);
+		     }
+		
 
 			delay(50);
 	}
